@@ -28,10 +28,10 @@ func TestHandler_Create(t *testing.T) {
 			Name: "Demo Course",
 		}
 
-		json, err := json.Marshal(createCourseReq)
+		body, err := json.Marshal(createCourseReq)
 		require.NoError(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, "/courses", bytes.NewBuffer(json))
+		req, err := http.NewRequest(http.MethodPost, "/courses", bytes.NewBuffer(body))
 		require.NoError(t, err)
 
 		rec := httptest.NewRecorder()
