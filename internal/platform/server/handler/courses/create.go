@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	mooc "github.com/jrvldam/hexagonal-http-api-golang/internal"
 	"github.com/jrvldam/hexagonal-http-api-golang/internal/creating"
+	"github.com/jrvldam/hexagonal-http-api-golang/kit/command"
 )
 
 type createRequest struct {
@@ -16,28 +17,28 @@ type createRequest struct {
 }
 
 // CreateHandler returns an HTTP handler for courses creation
-func CreateHandler(creatingCourseService creating.CourseService) gin.HandlerFunc {
-	return func(c *gin.Context) {
+func CreateHandler(commandBus command.Bus) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 		var req createRequest
 
-		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
+		if err := ctx.BindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, err.Error())
 			return
 		}
 
-		err := creatingCourseService.CreateCourse(c, req.ID, req.Name, req.Duration)
+		err := commandBus.Dispatch(ctx, creating.NewCourseCommand(req.ID, req.Name, req.Duration))
 
 		if err != nil {
 			switch {
 			case errors.Is(err, mooc.ErrInvalidCourseID), errors.Is(err, mooc.ErrEmptyCourseName), errors.Is(err, mooc.ErrInvalidCourseID):
-				c.JSON(http.StatusBadRequest, err.Error())
+				ctx.JSON(http.StatusBadRequest, err.Error())
 				return
 			default:
-				c.JSON(http.StatusInternalServerError, err.Error())
+				ctx.JSON(http.StatusInternalServerError, err.Error())
 				return
 			}
 		}
 
-		c.Status(http.StatusCreated)
+		ctx.Status(http.StatusCreated)
 	}
 }
