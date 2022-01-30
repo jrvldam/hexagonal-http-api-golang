@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jrvldam/hexagonal-http-api-golang/internal/creating"
 	"github.com/jrvldam/hexagonal-http-api-golang/internal/platform/server"
 	"github.com/jrvldam/hexagonal-http-api-golang/internal/platform/storage/mysql"
 )
@@ -13,11 +14,11 @@ const (
 	host = "localhost"
 	port = 8080
 
-	dbUser = "dbUser"
-	dbPass = "dbPass"
-	dbHost = "dbHost"
-	dbPort = "dbPort"
-	dbName = "dbName"
+	dbUser = "root"
+	dbPass = "BATMAN"
+	dbHost = "127.0.0.1"
+	dbPort = "8083"
+	dbName = "courses_db"
 )
 
 func Run() error {
@@ -29,7 +30,8 @@ func Run() error {
 	}
 
 	courseRepository := mysql.NewCourseRepository(db)
+	creatingCourseService := creating.NewCourseService(courseRepository)
 
-	srv := server.New(host, port, courseRepository)
+	srv := server.New(host, port, creatingCourseService)
 	return srv.Run()
 }
