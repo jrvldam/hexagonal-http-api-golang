@@ -30,13 +30,11 @@ func Run() error {
 		return err
 	}
 
-	var (
-		commandBus = inmemory.NewCommandBus()
-	)
-
 	courseRepository := mysql.NewCourseRepository(db)
 	creatingCourseService := creating.NewCourseService(courseRepository)
 	createCourseCommandHandler := creating.NewCourseCommandHandler(creatingCourseService)
+
+	var commandBus = inmemory.NewCommandBus()
 
 	commandBus.Register(creating.CourseCommandType, createCourseCommandHandler)
 
