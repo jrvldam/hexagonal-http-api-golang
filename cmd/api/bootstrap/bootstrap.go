@@ -1,8 +1,10 @@
 package bootstrap
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jrvldam/hexagonal-http-api-golang/internal/creating"
@@ -12,8 +14,9 @@ import (
 )
 
 const (
-	host = "localhost"
-	port = 8080
+	host            = "localhost"
+	port            = 8080
+	shutdownTimeout = 10 * time.Second
 
 	dbUser = "root"
 	dbPass = "BATMAN"
@@ -38,6 +41,6 @@ func Run() error {
 
 	commandBus.Register(creating.CourseCommandType, createCourseCommandHandler)
 
-	srv := server.New(host, port, commandBus)
-	return srv.Run()
+	ctx, srv := server.New(context.Background(), host, port, shutdownTimeout, commandBus)
+	return srv.Run(ctx)
 }
