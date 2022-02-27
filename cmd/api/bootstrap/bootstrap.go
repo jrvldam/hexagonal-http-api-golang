@@ -18,11 +18,12 @@ const (
 	port            = 8080
 	shutdownTimeout = 10 * time.Second
 
-	dbUser = "root"
-	dbPass = "BATMAN"
-	dbHost = "127.0.0.1"
-	dbPort = "8083"
-	dbName = "courses_db"
+	dbUser    = "root"
+	dbPass    = "BATMAN"
+	dbHost    = "127.0.0.1"
+	dbPort    = "8083"
+	dbName    = "courses_db"
+	dbTimeout = 5 * time.Second
 )
 
 func Run() error {
@@ -33,7 +34,7 @@ func Run() error {
 		return err
 	}
 
-	courseRepository := mysql.NewCourseRepository(db)
+	courseRepository := mysql.NewCourseRepository(db, dbTimeout)
 	creatingCourseService := creating.NewCourseService(courseRepository)
 	createCourseCommandHandler := creating.NewCourseCommandHandler(creatingCourseService)
 

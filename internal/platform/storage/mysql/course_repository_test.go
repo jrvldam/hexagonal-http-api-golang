@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	mooc "github.com/jrvldam/hexagonal-http-api-golang/internal"
@@ -25,7 +26,7 @@ func Test_CourseRepository_Save_RepositoryError(t *testing.T) {
 		WithArgs(courseID, courseName, courseDuration).
 		WillReturnError(errors.New("something-failed"))
 
-	repo := NewCourseRepository(db)
+	repo := NewCourseRepository(db, 1*time.Millisecond)
 
 	// When
 	err = repo.Save(context.Background(), course)
@@ -49,7 +50,7 @@ func Test_CourseRepository_Save_Succeed(t *testing.T) {
 		WithArgs(courseID, courseName, courseDuration).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
-	repo := NewCourseRepository(db)
+	repo := NewCourseRepository(db, 1*time.Millisecond)
 
 	// When
 	err = repo.Save(context.Background(), course)
